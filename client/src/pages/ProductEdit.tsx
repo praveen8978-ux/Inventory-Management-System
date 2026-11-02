@@ -68,6 +68,7 @@ export default function ProductEdit() {
   const [formError, setFormError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [lastNote, setLastNote] = useState("");
 
   useEffect(() => {
     if (!id) return;
@@ -86,6 +87,7 @@ export default function ProductEdit() {
           sellingPrice: optional(p.sellingPrice),
           lowStockThreshold: optional(p.lowStockThreshold),
         });
+        setLastNote(p.lastAdjustmentNote ?? "");
       })
       .catch((err) => {
         if (!cancelled) setLoadError(parseApiError(err).message);
@@ -136,6 +138,7 @@ export default function ProductEdit() {
   return (
     <div className="max-w-xl">
       <h1 className="text-2xl font-semibold tracking-tight">{isEdit ? "Edit product" : "Add product"}</h1>
+         {isEdit && lastNote && <p className="mt-1 text-sm text-stone-500">Last stock note: {lastNote}</p>}
 
       <form onSubmit={onSubmit} noValidate className="mt-6 space-y-4 rounded-lg border border-stone-200 bg-white p-6">
         {formError && (

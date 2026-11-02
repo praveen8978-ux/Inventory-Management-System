@@ -2,7 +2,7 @@ import { Router, type Response } from "express";
 import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prisma";
 import { requireAuth } from "../middleware/auth";
-import { fieldErrors, productSchema, toProductData } from "../lib/validators";
+import { adjustSchema, fieldErrors, productSchema, toProductData } from "../lib/validators";
 import { getOrgDefaultThreshold, withStockStatus } from "../lib/stock";
 
 const router = Router();
@@ -107,6 +107,40 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+// PATCH /api/products/:id/adjust  { delta, note? }  -> add or remove units
+router.patch("/:id/adjust", async (req, res) => {
+  const { organizationId, userId } = req.auth!;
+  const parsed = adjustSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: "Please fix the highlighted fields", fieldErrors: fieldErrors(parsed.error) });
+  }
+  const { delta, note } = parsed.data;
+  try {
+    // One atomic query: the stock can only drop if enough units exist, so two requests
+    // at once can never push the quantity below zero.
+    const result = await prisma.product.updateMany({
+      where: { id: req.params.id, organizationId, quantityOnHand: { gte: delta < 0 ? -delta : 0 } },
+      data: { quantityOnHand: { increment: delta }, lastUpdatedBy: userId, lastAdjustmentNote: note || null },
+    });
+
+    if (result.count === 0) {
+      const existing = await prisma.product.findFirst({
+        where: { id: req.params.id, organizationId },
+        select: { quantityOnHand: true },
+      });
+      if (!existing) return notFound(res);
+      const msg = `You can't remove more than the ${existing.quantityOnHand} units in stock`;
+      return res.status(400).json({ error: msg, fieldErrors: { delta: msg } });
+    }
+
+    const updated = await prisma.product.findFirst({ where: { id: req.params.id, organizationId } });
+    if (!updated) return notFound(res);
+    const orgDefault = await getOrgDefaultThreshold(organizationId);
+    return res.json(withStockStatus(updated, orgDefault));
+  } catch (err) {
+    return handleError(res, err, "adjust stock");
+  }
+});
 // DELETE /api/products/:id  (hard delete)
 router.delete("/:id", async (req, res) => {
   const { organizationId } = req.auth!;

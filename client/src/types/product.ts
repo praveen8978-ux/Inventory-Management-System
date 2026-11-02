@@ -7,6 +7,7 @@ export type Product = {
   costPrice: number | null;
   sellingPrice: number | null;
   lowStockThreshold: number | null;
+  lastAdjustmentNote: string | null;
   effectiveThreshold: number; // product threshold, or the organization default when empty
   isLowStock: boolean;
   createdAt: string;

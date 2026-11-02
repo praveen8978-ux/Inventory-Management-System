@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, parseApiError } from "../api/client";
+import AdjustStockDialog from "../components/AdjustStockDialog";
 import ConfirmDialog from "../components/ConfirmDialog";
 import type { Product } from "../types/product";
 
@@ -23,6 +24,7 @@ export default function Products() {
   const [error, setError] = useState("");
   const [toDelete, setToDelete] = useState<Product | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [adjusting, setAdjusting] = useState<Product | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setQuery(search.trim()), 300);
@@ -47,6 +49,12 @@ export default function Products() {
   }, [query]);
 
   const cancelDelete = useCallback(() => setToDelete(null), []);
+  const closeAdjust = useCallback(() => setAdjusting(null), []);
+
+  function onAdjusted(updated: Product) {
+    setProducts((prev) => prev?.map((p) => (p.id === updated.id ? updated : p)) ?? null);
+    setAdjusting(null);
+  }
 
   async function confirmDelete() {
     if (!toDelete) return;
@@ -124,6 +132,7 @@ export default function Products() {
                     {p.sellingPrice == null ? <span className="text-stone-400">-</span> : priceFormat.format(p.sellingPrice)}
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-right">
+                    <button onClick={() => setAdjusting(p)} className="mr-4 font-medium text-teal-700 hover:underline">Adjust stock</button>
                     <Link to={`/products/${p.id}`} className="font-medium text-teal-700 hover:underline">Edit</Link>
                     <button onClick={() => setToDelete(p)} className="ml-4 font-medium text-red-700 hover:underline">Delete</button>
                   </td>
@@ -133,6 +142,8 @@ export default function Products() {
           </table>
         ) : null}
       </div>
+
+      {adjusting && <AdjustStockDialog product={adjusting} onClose={closeAdjust} onSaved={onAdjusted} />}
 
       <ConfirmDialog
         open={toDelete !== null}

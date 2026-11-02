@@ -73,3 +73,15 @@ export function toProductData(input: ProductInput) {
 export const settingsSchema = z.object({
   defaultLowStockThreshold: wholeNumber("Default low stock threshold"),
 });
+
+
+// ---------- Stock adjustment ----------
+export const adjustSchema = z.object({
+  delta: z
+    .number("Enter a number of units")
+    .int("Units must be a whole number")
+    .min(-1_000_000_000, "That change is too large")
+    .max(1_000_000_000, "That change is too large")
+    .refine((n) => n !== 0, "Enter a number other than 0"),
+  note: z.string().trim().max(200, "Note must be 200 characters or fewer").nullish(),
+});
