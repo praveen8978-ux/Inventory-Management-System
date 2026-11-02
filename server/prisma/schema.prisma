@@ -37,6 +37,7 @@ model Product {
   sellingPrice      Float?
   lowStockThreshold Int?
   lastUpdatedBy     String?
+  lastAdjustmentNote String?
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt
 
