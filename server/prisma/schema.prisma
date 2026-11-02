@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" // switch to "postgresql" and update DATABASE_URL to move to Postgres
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id                       String    @id @default(cuid())
+  name                     String
+  defaultLowStockThreshold Int       @default(5)
+  createdAt                DateTime  @default(now())
+  users                    User[]
+  products                 Product[]
+}
+
+model User {
+  id             String       @id @default(cuid())
+  email          String       @unique
+  passwordHash   String
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime     @default(now())
+}
+
+model Product {
+  id                String       @id @default(cuid())
+  organizationId    String
+  organization      Organization @relation(fields: [organizationId], references: [id])
+  name              String
+  sku               String
+  description       String?
+  quantityOnHand    Int          @default(0)
+  costPrice         Float?
+  sellingPrice      Float?
+  lowStockThreshold Int?
+  lastUpdatedBy     String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@unique([organizationId, sku])
+  @@index([organizationId])
+}
