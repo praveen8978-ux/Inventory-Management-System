@@ -34,7 +34,14 @@ router.get("/", async (req, res) => {
       prisma.product.findMany({
         where: {
           organizationId,
-          ...(search ? { OR: [{ name: { contains: search } }, { sku: { contains: search } }] } : {}),
+          ...(search
+            ? {
+                OR: [
+                    { name: { contains: search, mode: "insensitive" as const } },
+                    { sku: { contains: search, mode: "insensitive" as const } },
+                ],
+              }
+            : {}),
         },
         orderBy: { name: "asc" },
       }),
