@@ -67,3 +67,9 @@ export function toProductData(input: ProductInput) {
     lowStockThreshold: input.lowStockThreshold ?? null,
   };
 }
+
+
+// ---------- Settings ----------
+export const settingsSchema = z.object({
+  defaultLowStockThreshold: wholeNumber("Default low stock threshold"),
+});

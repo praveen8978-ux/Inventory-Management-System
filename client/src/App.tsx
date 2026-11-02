@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import ProductEdit from "./pages/ProductEdit";
 import Products from "./pages/Products";
+import Settings from "./pages/Settings";
 import Signup from "./pages/Signup";
 
 export default function App() {
@@ -22,6 +23,7 @@ export default function App() {
             <Route path="/products" element={<Products />} />
             <Route path="/products/new" element={<ProductEdit />} />
             <Route path="/products/:id" element={<ProductEdit />} />
+            <Route path="/settings" element={<Settings />} />
           </Route>
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />

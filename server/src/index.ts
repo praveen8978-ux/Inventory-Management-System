@@ -5,6 +5,8 @@ import cookieParser from "cookie-parser";
 import { prisma } from "./lib/prisma";
 import authRoutes from "./routes/auth";
 import productRoutes from "./routes/products";
+import dashboardRoutes from "./routes/dashboard";
+import settingsRoutes from "./routes/settings";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 4000;
@@ -29,6 +31,8 @@ app.get("/api/health", async (_req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/settings", settingsRoutes);
 
 app.listen(PORT, () => {
   console.log(`StockFlow API running on http://localhost:${PORT}`);
