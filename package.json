@@ -5,6 +5,8 @@
     "install:all": "npm --prefix server install && npm --prefix client install",
     "db:migrate": "npm --prefix server run db:migrate",
     "dev:server": "npm --prefix server run dev",
-    "dev:client": "npm --prefix client run dev"
+    "dev:client": "npm --prefix client run dev",
+    "build": "npm --prefix client install --include=dev && npm --prefix client run build && npm --prefix server install --include=dev && npm --prefix server run build:prod",
+    "start": "npm --prefix server run start:prod"
   }
 }
