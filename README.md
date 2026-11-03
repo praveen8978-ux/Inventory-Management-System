@@ -3,7 +3,7 @@
 A small multi-tenant inventory management app. Each organization signs up, manages its own
 products, adjusts stock, and sees a dashboard with low-stock items.
 
-**Live demo:** LIVE_LINK_HERE
+**Live demo:** https://stockflow-inventory-gheu.onrender.com
 **Demo login:** `demo@stockflow.dev` / `Demo@12345`
 
 ## Features
